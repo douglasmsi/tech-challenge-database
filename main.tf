@@ -32,7 +32,6 @@ resource "aws_db_instance" "example" {
   engine               = "postgres"
   engine_version       = "12.6" # Substitua pela versão desejada do PostgreSQL
   instance_class       = "db.t2.micro" # Substitua pela classe de instância desejada
-  name                 = "example-db"
   username             = "db_username"
   password             = "db_password"
   parameter_group_name = "default.postgres12"
