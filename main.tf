@@ -16,14 +16,14 @@ data "aws_subnet" "tech-challenge-subnets" {
   vpc_id = data.aws_vpc.tech-challenge-vpc.id
 }
 
-output "subnet_ids" {
+output "subnets" {
   value = data.aws_subnet.tech-challenge-subnets.id
 }
 
 resource "aws_db_subnet_group" "example" {
   name        = "example"
   description = "Example DB subnet group"
-  subnet_ids  = "[${data.aws_subnet.tech-challenge-subnets.*.id}]"
+  subnets  = "[${data.aws_subnet.tech-challenge-subnets.*.id}]"
 }
 
 resource "aws_db_instance" "example" {
