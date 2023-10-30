@@ -1,7 +1,7 @@
 resource "kubernetes_service" "demo_app_mysql_service" {
   metadata {
     name      = "demo-app-mysql"
-    namespace = kubernetes_namespace.demo_app_ns.metadata.0.name
+    namespace = kubernetes_namespace.tech-challenge-namespace.metadata.0.name
     labels = {
       app = "demo-app"
     }
@@ -24,7 +24,7 @@ resource "kubernetes_service" "demo_app_mysql_service" {
 resource "kubernetes_persistent_volume_claim" "demo_app_pvc" {
   metadata {
     name      = "mysql-pvc"
-    namespace = kubernetes_namespace.demo_app_ns.metadata.0.name
+    namespace = kubernetes_namespace.tech-challenge-namespace.metadata.0.name
     labels = {
       app = "demo-app"
     }
@@ -44,7 +44,7 @@ resource "kubernetes_persistent_volume_claim" "demo_app_pvc" {
 resource "kubernetes_deployment" "demo_app_mysql_deployment" {
   metadata {
     name      = "demo-app-mysql"
-    namespace = kubernetes_namespace.demo_app_ns.metadata.0.name
+    namespace = kubernetes_namespace.tech-challenge-namespace.metadata.0.name
     labels = {
       app = "demo-app"
     }

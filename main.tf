@@ -1,10 +1,5 @@
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
-  config_context = "my-context"
-}
-
-resource "kubernetes_namespace" "demo_app_ns" {
-  metadata {
-    name = "demo-app-ns"
-  }
+  host                   = data.aws_eks_cluster.default.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.default.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.default.token
 }
