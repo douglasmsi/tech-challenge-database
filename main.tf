@@ -19,10 +19,10 @@ data "aws_subnet" "subnets" {
 }
 
 resource "aws_security_group" "subnet" {
-  vpc_id = data.aws_subnet.selected.vpc_id
+  vpc_id = data.aws_subnet.subnets.vpc_id
 
   ingress {
-    cidr_blocks = [data.aws_subnet.selected.cidr_block]
+    cidr_blocks = [data.aws_subnet.subnets.cidr_block]
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
@@ -42,7 +42,7 @@ resource "aws_db_instance" "example" {
   password             = "db_password"
   parameter_group_name = "default.postgres12"
   skip_final_snapshot  = true
-  vpc_security_group_ids = [data.aws_subnet.selected.id]
+  vpc_security_group_ids = [data.aws_subnet.subnets.id]
   #db_subnet_group_name  = aws_db_subnet_group.tech-challenge-db-subnet-group.name
 }
 
