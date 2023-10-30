@@ -8,8 +8,13 @@ data "aws_vpc" "tech-challenge-vpc" {
   }
 }
 
-data "aws_subnet" "selected" {
+data "aws_subnet" "subnets" {
     vpc_id = data.aws_vpc.tech-challenge-vpc.id
+
+    filter {
+      name   = "tag:team"
+      values = ["tech-challenge"]
+    }
 
 }
 
