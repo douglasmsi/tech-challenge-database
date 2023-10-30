@@ -8,16 +8,29 @@ data "aws_vpc" "tech-challenge-vpc" {
   }
 }
 
-data "aws_subnet_ids" "all" {
-  vpc_id = data.aws_vpc.tech-challenge-vpc.id
+variable "subnet_id" {}
+
+data "aws_subnet" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = ["tech-challenge-vpc"]
+  }
 }
 
-resource "aws_db_subnet_group" "tech-challenge-db-subnet-group" {
-  name        = "tech-challenge-db-subnet-group"
-  description = "Example DB subnet group"
-  subnet_ids = [data.aws_subnet_ids.all.ids]
+resource "aws_security_group" "subnet" {
+  vpc_id = data.aws_subnet.selected.vpc_id
 
+  ingress {
+    type        = "ingress"
+    cidr_blocks = [data.aws_subnet.selected.cidr_block]
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+  }
 }
+
+
+
 
 resource "aws_db_instance" "example" {
   allocated_storage    = 20
@@ -29,8 +42,8 @@ resource "aws_db_instance" "example" {
   password             = "db_password"
   parameter_group_name = "default.postgres12"
   skip_final_snapshot  = true
-  vpc_security_group_ids = [data.aws_subnet_ids.all.ids]
-  db_subnet_group_name  = aws_db_subnet_group.tech-challenge-db-subnet-group.name
+  vpc_security_group_ids = [data.aws_subnet.selected.id]
+  #db_subnet_group_name  = aws_db_subnet_group.tech-challenge-db-subnet-group.name
 }
 
 resource "aws_security_group" "example" {
