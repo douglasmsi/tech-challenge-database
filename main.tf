@@ -19,7 +19,6 @@ resource "aws_security_group" "subnet" {
   vpc_id = data.aws_subnet.selected.vpc_id
 
   ingress {
-    type        = "ingress"
     cidr_blocks = [data.aws_subnet.selected.cidr_block]
     from_port   = 5432
     to_port     = 5432
