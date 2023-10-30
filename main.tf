@@ -1,36 +1,67 @@
-# https://www.terraform.io/docs/providers/aws/r/db_instance.html
 provider "aws" {
-  profile = "default"
-  region  = "us-east-1"
+  region = "us-east-1"
 }
+
+##############################################################
+# Data sources to get VPC, subnets and security group details
+##############################################################
 data "aws_vpc" "default" {
   default = true
 }
-resource "random_string" "uddin-db-password" {
-  length  = 32
-  upper   = true
-  special = false
+
+data "aws_subnet_ids" "all" {
+  vpc_id = data.aws_vpc.default.id
 }
-resource "aws_security_group" "uddin" {
-  vpc_id      = data.aws_vpc.default.id
-  name        = "uddin"
-  description = "Allow all inbound for Postgres"
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+
+data "aws_security_group" "default" {
+  vpc_id = data.aws_vpc.default.id
+  name   = "default"
+}
+
+#####
+# DB
+#####
+module "db" {
+  source = "../../"
+
+  identifier = "tech-challenge-database"
+
+  engine            = "postgres"
+  engine_version    = "9.6.3"
+  instance_class    = "db.t2.micro"
+  allocated_storage = 5
+  storage_encrypted = false
+
+  # kms_key_id        = "arm:aws:kms:<region>:<accound id>:key/<kms key id>"
+  name = "tech-challenge-database"
+
+  # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
+  # "Error creating DB Instance: InvalidParameterValue: MasterUsername
+  # user cannot be used as it is a reserved word used by the engine"
+  username = "techchallengeuser"
+
+  password = "techchallengepassword"
+  port     = "5432"
+
+  vpc_security_group_ids = [data.aws_security_group.default.id]
+
+  maintenance_window = "Mon:00:00-Mon:03:00"
+  backup_window      = "03:00-06:00"
+
+  # disable backups to create DB faster
+  backup_retention_period = 0
+
+  tags = {
+    Owner       = "user"
+    Environment = "production"
   }
-}
-resource "aws_db_instance" "uddin-sameed" {
-  identifier             = "uddin-sameed"
-  instance_class         = "db.t2.micro"
-  allocated_storage      = 5
-  engine                 = "postgres"
-  engine_version         = "12.5"
-  skip_final_snapshot    = true
-  publicly_accessible    = true
-  vpc_security_group_ids = [aws_security_group.uddin.id]
-  username               = "sameed"
-  password               = "random_string.uddin-db-password.result}"
+
+  # DB subnet group
+  subnet_ids = [data.aws_subnet_ids.all.ids]
+
+  # DB parameter group
+  family = "postgres9.6"
+
+  # Snapshot name upon DB deletion
+  final_snapshot_identifier = "tech-challenge-database"
 }
