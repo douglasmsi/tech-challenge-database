@@ -23,7 +23,7 @@ output "subnets" {
 resource "aws_db_subnet_group" "example" {
   name        = "example"
   description = "Example DB subnet group"
-  subnets  = "[${data.aws_subnet.tech-challenge-subnets.*.id}]"
+  subnet_ids  = data.aws_subnet.tech-challenge-subnets.*.id
 }
 
 resource "aws_db_instance" "example" {
