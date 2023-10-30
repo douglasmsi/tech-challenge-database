@@ -1,21 +1,10 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
-terraform {
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">= 2.0.0"
-    }
-  }
-}
-
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path    = "~/.kube/config"
+  config_context = "my-context"
 }
 
-resource "kubernetes_namespace" "tech-challenge-database-namespace" {
+resource "kubernetes_namespace" "demo_app_ns" {
   metadata {
-    name = "tech-challenge-database-namespace"
+    name = "demo-app-ns"
   }
 }

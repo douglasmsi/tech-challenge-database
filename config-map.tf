@@ -1,12 +1,12 @@
-resource "kubernetes_config_map" "tech-challenge-config-map" {
+resource "kubernetes_config_map" "demo_app_cm" {
   metadata {
-    name = "postgres-config-map"
-    namespace = kubernetes_namespace.tech-challenge-database-namespace.metadata.0.name
+    name = "mysql-config-map"
+    namespace = kubernetes_namespace.demo_app_ns.metadata.0.name
   }
 
   data = {
-    postgres-server        = "tech-challenge-postgres"
-    postgres-database-name = "tech-challenge-database"
-    postgres-user-username = "tech-challenge-user"
+    mysql-server        = "demo-app-mysql"
+    mysql-database-name = "demoDb"
+    mysql-user-username = "myUser"
   }
 }
