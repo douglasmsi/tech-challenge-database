@@ -41,7 +41,6 @@ data "aws_subnets" "private" {
 
 resource "aws_security_group" "tech-challenge-sg" {
   name_prefix = "tech-challenge-database-"
-  subnet = data.aws_subnets.private.ids[0]
 
   ingress {
     from_port   = 5432
