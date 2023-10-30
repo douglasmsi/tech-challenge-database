@@ -2,27 +2,48 @@ provider "aws" {
   region = "us-east-1" # Substitua pela sua região
 }
 
-data "aws_vpc" "tech-challenge-vpc" {
-  tags = {
-    Name = "tech-challenge-vpc" # Substitua pelo nome da sua VPC
+locals {
+  vpc_name = "tech-challenge-vpc"
+}
+
+data "aws_vpc" "vpc" {
+  filter {
+    name   = "tag:Name"
+    values = [local.vpc_name]
   }
 }
 
-data "aws_subnet" "subnets" {
-    vpc_id = data.aws_vpc.tech-challenge-vpc.id
+data "aws_subnets" "public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
 
-    filter {
-      name   = "tag:team"
-      values = ["tech-challenge"]
-    }
-
+  filter {
+    name   = "tag:Name"
+    values = ["${local.vpc_name}-public-*"]
+  }
 }
 
-resource "aws_security_group" "subnet" {
-  vpc_id = data.aws_subnet.subnets.vpc_id
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = ["${local.vpc_name}-private-*"]
+  }
+}
+
+
+
+resource "aws_security_group" "tech-challenge-sg" {
+  name_prefix = "tech-challenge-database-"
+  subnet = data.aws_subnets.private.ids[0]
 
   ingress {
-    cidr_blocks = [data.aws_subnet.subnets.cidr_block]
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
@@ -32,7 +53,7 @@ resource "aws_security_group" "subnet" {
 
 
 
-resource "aws_db_instance" "example" {
+resource "aws_db_instance" "tech-challenge-database" {
   allocated_storage    = 20
   storage_type         = "gp2"
   engine               = "postgres"
@@ -42,14 +63,11 @@ resource "aws_db_instance" "example" {
   password             = "db_password"
   parameter_group_name = "default.postgres12"
   skip_final_snapshot  = true
-  vpc_security_group_ids = [data.aws_subnet.subnets.id]
+  vpc_security_group_ids = [aws_security_group.tech-challenge-sg.id]
   #db_subnet_group_name  = aws_db_subnet_group.tech-challenge-db-subnet-group.name
 }
 
-resource "aws_security_group" "example" {
-  name_prefix = "example-"
-}
 
 output "db_endpoint" {
-  value = aws_db_instance.example.endpoint
+  value = aws_db_instance.tech-challenge-database.endpoint
 }
