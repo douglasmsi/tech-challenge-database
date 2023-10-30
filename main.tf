@@ -8,8 +8,6 @@ data "aws_vpc" "tech-challenge-vpc" {
   }
 }
 
-variable "subnet_id" {}
-
 data "aws_subnet" "selected" {
   filter {
     name   = "tag:Name"
@@ -48,16 +46,6 @@ resource "aws_db_instance" "example" {
 
 resource "aws_security_group" "example" {
   name_prefix = "example-"
-}
-
-resource "aws_security_group_rule" "example" {
-  type        = "ingress"
-  from_port   = 5432 # Porta padrão do PostgreSQL
-  to_port     = 5432
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"] # Restringir a faixa de IP conforme necessário
-  security_group_id = aws_security_group.example.id # Substitua pelo ID do grupo de segurança do banco de dados
-  #source_security_group_id = aws_security_group.cluster.id # Substitua pelo ID do grupo de segurança do cluster EKS
 }
 
 output "db_endpoint" {
