@@ -12,12 +12,18 @@ output "vpc_id" {
   value = data.aws_vpc.tech-challenge-vpc.id
 }
 
+variable "subnet_id" {}
+
+data "aws_subnet" "selected" {
+  id = var.subnet_id
+}
+
 data "aws_subnet" "tech-challenge-subnets" {
   vpc_id = data.aws_vpc.tech-challenge-vpc.id
 }
 
 output "subnets" {
-  value = data.aws_subnet.tech-challenge-subnets.id
+  value = data.aws_subnet.tech-challenge-subnets.*.id
 }
 
 resource "aws_db_subnet_group" "example" {
