@@ -9,10 +9,8 @@ data "aws_vpc" "tech-challenge-vpc" {
 }
 
 data "aws_subnet" "selected" {
-  filter {
-    name   = "tag:Name"
-    values = ["tech-challenge-vpc"]
-  }
+    vpc_id = data.aws_vpc.tech-challenge-vpc.id
+
 }
 
 resource "aws_security_group" "subnet" {
